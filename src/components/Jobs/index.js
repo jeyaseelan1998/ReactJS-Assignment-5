@@ -223,7 +223,7 @@ class Jobs extends Component {
         alt="failure view"
       />
       <h1>Oops! Something Went Wrong</h1>
-      <p>We cannot sæm to find the page you are looking for.</p>
+      <p>We cannot seem to find the page you are looking for.</p>
       <button type="button" className="retry-button" onClick={this.getJobsList}>
         Retry
       </button>
