@@ -9,6 +9,44 @@ import JobItem from '../JobItem'
 
 import './index.css'
 
+const employmentTypesList = [
+  {
+    label: 'Full Time',
+    employmentTypeId: 'FULLTIME',
+  },
+  {
+    label: 'Part Time',
+    employmentTypeId: 'PARTTIME',
+  },
+  {
+    label: 'Freelance',
+    employmentTypeId: 'FREELANCE',
+  },
+  {
+    label: 'Internship',
+    employmentTypeId: 'INTERNSHIP',
+  },
+]
+
+const salaryRangesList = [
+  {
+    salaryRangeId: '1000000',
+    label: '10 LPA and above',
+  },
+  {
+    salaryRangeId: '2000000',
+    label: '20 LPA and above',
+  },
+  {
+    salaryRangeId: '3000000',
+    label: '30 LPA and above',
+  },
+  {
+    salaryRangeId: '4000000',
+    label: '40 LPA and above',
+  },
+]
+
 const apiStatusConstants = {
   initial: 'INITIAL',
   inProgress: 'IN PROGRESS',
@@ -18,8 +56,11 @@ const apiStatusConstants = {
 
 const initialState = {
   searchInput: '',
-  employmentType: '',
   minimumPackage: '',
+  FULLTIME: false,
+  PARTTIME: false,
+  FREELANCE: false,
+  INTERNSHIP: false,
 }
 
 class Jobs extends Component {
@@ -34,6 +75,15 @@ class Jobs extends Component {
   componentDidMount() {
     this.getProfileDetails()
     this.getJobsList()
+  }
+
+  updateEmploymentType = event => {
+    const {name, checked} = event.target
+    this.setState({[name]: checked}, this.getJobsList)
+  }
+
+  updateMinimumPackage = event => {
+    this.setState({minimumPackage: event.target.value}, this.getJobsList)
   }
 
   getProfileDetails = async () => {
@@ -78,11 +128,25 @@ class Jobs extends Component {
       title: eachJob.title,
     }))
 
+  getFormattedEmploymentQuery = () => {
+    const {FULLTIME, PARTTIME, FREELANCE, INTERNSHIP} = this.state
+
+    let employmentTypeString = `${FULLTIME ? 'FULLTIME,' : ''}${
+      PARTTIME ? 'PARTTIME,' : ''
+    }${FREELANCE ? 'FREELANCE,' : ''}${INTERNSHIP ? 'INTERNSHIP,' : ''}`
+    employmentTypeString = employmentTypeString.slice(
+      0,
+      employmentTypeString.length - 1,
+    )
+    return employmentTypeString
+  }
+
   getJobsList = async () => {
     this.setState({jobsApiStatus: apiStatusConstants.inProgress})
+    const {searchInput, minimumPackage} = this.state
     const jwtToken = Cookies.get('jwt_token')
-    const {searchInput, employmentType, minimumPackage} = this.state
-    const apiUrl = `https://apis.ccbp.in/jobs?employment_type=${employmentType}&minimum_package=${minimumPackage}&search=${searchInput}`
+    const employmentTypeString = this.getFormattedEmploymentQuery()
+    const apiUrl = `https://apis.ccbp.in/jobs?employment_type=${employmentTypeString}&minimum_package=${minimumPackage}&search=${searchInput}`
     const options = {
       method: 'GET',
       headers: {
@@ -206,7 +270,13 @@ class Jobs extends Component {
               profileApiStatus={profileApiStatus}
               getProfileDetails={this.getProfileDetails}
             />
-            <FilterGroup />
+            <hr className="separator" />
+            <FilterGroup
+              updateEmploymentType={this.updateEmploymentType}
+              employmentTypesList={employmentTypesList}
+              salaryRangesList={salaryRangesList}
+              updateMinimumPackage={this.updateMinimumPackage}
+            />
           </div>
           <div className="search-job-items-container">
             {this.renderSearchBar()}
