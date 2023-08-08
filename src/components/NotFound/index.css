@@ -1,5 +1,5 @@
 .not-found-container {
-  flex-grow: 1;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -8,7 +8,7 @@
 }
 
 .not-found-image {
-  max-width: 480px;
+  margin-bottom: 15px;
 }
 
 .not-found-heading {
